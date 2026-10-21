@@ -1,0 +1,51 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "infra/**"
+      - ".github/workflows/terraform-plan.yml"
+
+permissions:
+  id-token: write       # OIDC token ke liye
+  contents: read        # checkout ke liye
+
+env:
+  AWS_REGION: ap-south-1
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  plan:
+    name: fmt, validate, plan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.11.4"
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -input=false -no-color
