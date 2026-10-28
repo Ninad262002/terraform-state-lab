@@ -11,6 +11,7 @@ resource "aws_s3_bucket" "demo" {
   tags = {
     Project   = "terraform-state-lab"
     ManagedBy = "Terraform"
+    Owner     = "ninad"
   }
 }
 
