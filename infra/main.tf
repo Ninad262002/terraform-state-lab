@@ -11,23 +11,17 @@ resource "aws_s3_bucket" "demo" {
   tags = {
     Project   = "terraform-state-lab"
     ManagedBy = "Terraform"
-    Owner     = "ninad"
+    Owner     = "luffy"
   }
 }
 
 resource "aws_s3_bucket" "rescued" {
-  bucket = "tfstate-lab-practice-b299d01e"
+  bucket = "tfstate-lab-practice-${random_id.suffix.hex}"
   tags = {
     Project   = "terraform-state-lab"
     ManagedBy = "terraform"
   }
 }
-
-import {
-  to = aws_s3_bucket.rescued
-  id = "tfstate-lab-practice-b299d01e"
-}
-
 
 resource "aws_s3_bucket" "drift_test" {
   bucket = "tfstate-lab-drift-${random_id.suffix.hex}"
